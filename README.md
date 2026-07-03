@@ -1,82 +1,274 @@
-# CoutureWay — Luxury Tailoring Platform
+# 👔 CoutureWay
 
-Full-stack luxury fashion e-commerce and custom tailoring platform.
+> A modern AI-powered custom tailoring platform that bridges customers, tailors, and fashion businesses through a seamless digital experience.
 
-- **Frontend:** TanStack Start (React 19, Vite 7, Tailwind v4, framer-motion) — visually unchanged from the original.
-- **Backend:** Python **Flask REST API** + **SQLAlchemy** (migrated from Supabase). SQLite in dev; PostgreSQL/MySQL via a single `DATABASE_URL` change.
-- **Auth:** JWT (email + password). Signup/signin issue a bearer token consumed by the frontend data layer.
+![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?logo=typescript)
+![Flask](https://img.shields.io/badge/Backend-Flask-000000?logo=flask)
+![SQLAlchemy](https://img.shields.io/badge/Database-SQLAlchemy-red)
+![REST API](https://img.shields.io/badge/API-REST-success)
 
-## Repository layout
+---
+
+# 📖 Overview
+
+CoutureWay is a full-stack custom tailoring platform designed to modernize the tailoring experience. Customers can browse products, schedule tailoring appointments, provide measurements, place customized orders, and track their purchases, while administrators manage products, orders, appointments, and customer interactions through a scalable backend.
+
+The project combines a modern React frontend with a Flask REST API backend, providing a clean separation between the user interface and business logic for better scalability and maintainability.
+
+---
+
+# ✨ Features
+
+## Customer
+
+- User Authentication
+- Browse Tailoring Services
+- Product Catalog
+- Custom Clothing Orders
+- Shopping Cart
+- Secure Checkout Flow
+- Measurement Management
+- Appointment Booking
+- Order Tracking
+- Notifications
+- Responsive UI
+
+---
+
+## Admin
+
+- Dashboard
+- Product Management
+- Order Management
+- Customer Management
+- Appointment Scheduling
+- Notification System
+
+---
+
+# 🏗️ Project Architecture
 
 ```
-├── src/                    # TanStack Start frontend (UI untouched by the migration)
-│   ├── lib/api-client.ts   # single data-layer entry point → Flask REST API
-│   └── routes/             # pages (file-based routing)
-├── flask-backend/          # Python Flask REST backend (clean architecture)
+                React + TypeScript
+                       │
+                REST API Requests
+                       │
+                 Flask Backend
+                       │
+      ┌────────────────┼────────────────┐
+      │                │                │
+ Authentication    Business Logic   Validation
+      │                │                │
+      └────────────────┼────────────────┘
+                       │
+                  SQL Database
+```
+
+---
+
+# 🛠 Tech Stack
+
+## Frontend
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- TanStack Router
+- ShadCN UI
+
+## Backend
+
+- Flask
+- Flask REST API
+- SQLAlchemy
+- JWT Authentication
+- Flask Migrate
+- Marshmallow
+
+## Database
+
+- SQL (SQLite for development)
+- Easily configurable for PostgreSQL or MySQL
+
+---
+
+# 📂 Project Structure
+
+```
+CoutureWay
+│
+├── src/
+│   ├── components/
+│   ├── routes/
+│   ├── lib/
+│   └── assets/
+│
+├── flask-backend/
 │   ├── app/
-│   │   ├── routes/         # blueprints: auth, profile, products, orders,
-│   │   │                   # appointments, measurements, notifications, cart
-│   │   ├── models/         # SQLAlchemy models (schema parity with old Supabase DB)
-│   │   ├── services/       # business logic (incl. notification "triggers")
-│   │   ├── schemas/        # request validation
-│   │   ├── middleware/     # JWT guards + global JSON error handlers
-│   │   └── utils/          # tokens, hashing, responses, uuid
-│   ├── migrations/         # Flask-Migrate (see its README)
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   ├── middleware/
+│   │   └── utils/
+│   │
+│   ├── migrations/
 │   ├── requirements.txt
 │   └── run.py
-└── package.json
+│
+├── public/
+├── package.json
+└── README.md
 ```
 
-## Running the app
+---
 
-### 1. Backend (Flask)
+# 🚀 Getting Started
+
+## Clone Repository
+
+```bash
+git clone https://github.com/aryan-12-16-05/CoutureWay.git
+
+cd CoutureWay
+```
+
+---
+
+# Frontend Setup
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Run frontend
+
+```bash
+npm run dev
+```
+
+---
+
+# Backend Setup
+
+Navigate to backend
 
 ```bash
 cd flask-backend
-python -m venv venv
-source venv/bin/activate            # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env                # then edit secrets
-flask --app run.py init-db          # create tables + seed products
-flask --app run.py run              # http://localhost:5000
 ```
 
-Health check: `GET http://localhost:5000/api/health`.
-
-### 2. Frontend (TanStack Start)
+Create virtual environment
 
 ```bash
-cp .env.example .env                # sets VITE_API_BASE_URL=http://localhost:5000/api
-bun install                         # or: npm install
-bun run dev                         # or: npm run dev
+python -m venv venv
 ```
 
-The dev server prints its URL (typically http://localhost:8080 in the Lovable config). Make sure that origin is present in `CORS_ORIGINS` in `flask-backend/.env`.
+Activate environment
 
-## API surface
+### Windows
 
-All endpoints are prefixed with `/api`. Success responses are `{"data": ...}`, errors are `{"error": "...", "details"?: {...}}`.
+```bash
+venv\Scripts\activate
+```
 
-| Area | Endpoints |
-|---|---|
-| Auth | `POST /auth/signup`, `POST /auth/signin`, `GET /auth/me`, `POST /auth/signout` |
-| Profile | `GET /profile`, `PUT /profile` |
-| Products | `GET /products?category=&limit=`, `GET /products/:id`, admin: `POST /products`, `PUT/PATCH /products/:id`, `DELETE /products/:id` |
-| Orders | `GET /orders`, `GET /orders/:id`, `POST /orders`, admin: `PATCH /orders/:id` (status → notification) |
-| Appointments | `GET /appointments?order=asc|desc`, `POST /appointments` (→ notification), `PATCH /appointments/:id`, `DELETE /appointments/:id` |
-| Measurements | `GET /measurements`, `PUT /measurements` (upsert) |
-| Notifications | `GET /notifications?limit=`, `GET /notifications/unread-count`, `PATCH /notifications/:id/read`, `POST /notifications/read-all` |
-| Cart | `GET /cart`, `POST /cart/items`, `PATCH /cart/items/:id`, `DELETE /cart/items/:id` |
+### Linux / macOS
 
-Protected routes require `Authorization: Bearer <token>`.
+```bash
+source venv/bin/activate
+```
 
-## Behaviour parity notes
+Install dependencies
 
-- The email in `ADMIN_EMAIL` receives the admin role on signup (mirrors the old Postgres trigger).
-- Appointment creation and order status changes create in-app notifications (mirrors the old DB triggers).
-- Supabase realtime subscriptions were replaced with 30-second polling in the notifications bell and dashboard.
-- Google OAuth (previously Lovable Cloud) is not wired to the Flask backend; the button remains and explains this. Email auth is fully functional.
+```bash
+pip install -r requirements.txt
+```
 
-## Migration caveats
+Run backend
 
-See `MIGRATION_NOTES.md` for the list of binary assets and generated files you must copy from the original Lovable repo before first run.
+```bash
+python run.py
+```
+
+---
+
+# Environment Variables
+
+Frontend
+
+```
+VITE_API_URL=http://localhost:5000/api
+```
+
+Backend
+
+```
+SECRET_KEY=your_secret_key
+
+DATABASE_URL=sqlite:///coutureway.db
+
+JWT_SECRET_KEY=your_jwt_secret
+```
+
+---
+
+# REST API
+
+Example endpoints
+
+```
+POST   /api/auth/register
+
+POST   /api/auth/login
+
+GET    /api/products
+
+POST   /api/orders
+
+GET    /api/profile
+
+POST   /api/appointments
+
+GET    /api/notifications
+```
+
+---
+
+# Future Improvements
+
+- Payment Gateway Integration
+- AI-Based Size Recommendation
+- AI Fashion Assistant
+- Email Notifications
+- SMS Notifications
+- Inventory Management
+- Analytics Dashboard
+- Multi-Vendor Support
+- Cloud Deployment
+- Docker Support
+
+---
+
+# Contributing
+
+Contributions are welcome.
+
+1. Fork the repository
+2. Create a new feature branch
+3. Commit your changes
+4. Push the branch
+5. Open a Pull Request
+
+---
+
+# License
+
+This project is intended for educational and portfolio purposes.
+
+---
+
+# Author
+
+Developed with ❤️ as a full-stack custom tailoring platform using React, Flask, and SQL.
